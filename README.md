@@ -1,6 +1,6 @@
 # LAND
 
-Contracts for Decentraland's World.
+Contracts for Satyrn.crypto's World.
 
 ## Overview
 
