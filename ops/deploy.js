@@ -12,17 +12,17 @@ const run = async () => {
   const filename = './ops/config.testnet.json'
   const input = utils.readJSON(filename)
 
-  assert(input.SATYRNTokenAddress, 'Missing SATYRNToken address')
+  assert(input.TELESTOTokenAddress, 'Missing TELESTOToken address')
   assert(input.terraformReserveAddress, 'Missing TerraformReserve address')
   assert(input.returnVestingRegistryAddress, 'Missing ReturnVestingRegistry address')
 
   console.log(`Deploying contract: SPACETerraformSale`)
-  console.log(`  SATYRNToken: ${input.SATYRNTokenAddress}`)
+  console.log(`  TELESTOToken: ${input.TELESTOTokenAddress}`)
   console.log(`  TerraformReserve: ${input.terraformReserveAddress}`)
   console.log(`  ReturnVestingRegistry: ${input.returnVestingRegistryAddress}`)
 
   const sale = await SPACETerraformSale.new(
-    input.SATYRNTokenAddress,
+    input.TELESTOTokenAddress,
     input.terraformReserveAddress,
     input.returnVestingRegistryAddress,
     {gas: 4000000, gasPrice: 100e9}
