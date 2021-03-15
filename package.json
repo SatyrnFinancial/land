@@ -1,7 +1,7 @@
 {
-  "name": "land",
+  "name": "space",
   "version": "3.0.0",
-  "description": "Contract for Decentraland's LAND",
+  "description": "Contract for Decentraspace's SPACE",
   "scripts": {
     "test": "scripts/test.sh",
     "test:watch": "nodemon test/** contracts/** --exec 'npm test'",
@@ -10,14 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/decentraland/land.git"
+    "url": "git+https://github.com/decentraspace/space.git"
   },
-  "author": "The Decentraland Team <hello@decentraland.org>",
+  "author": "The Decentraspace Team <hello@decentraspace.org>",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/decentraland/land/issues"
+    "url": "https://github.com/decentraspace/space/issues"
   },
-  "homepage": "https://github.com/decentraland/land#readme",
+  "homepage": "https://github.com/decentraspace/space#readme",
   "dependencies": {
     "erc821": "^5.3.0",
     "openzeppelin-zos": "1.9.4",

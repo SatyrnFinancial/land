@@ -6,8 +6,8 @@ import "./upgradable/OwnableStorage.sol";
 
 import "erc821/contracts/AssetRegistryStorage.sol";
 
-import "./land/LANDStorage.sol";
+import "./space/SPACEStorage.sol";
 
 
-contract Storage is ProxyStorage, OwnableStorage, AssetRegistryStorage, LANDStorage {
+contract Storage is ProxyStorage, OwnableStorage, AssetRegistryStorage, SPACEStorage {
 }

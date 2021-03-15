@@ -4,5 +4,5 @@ import "../Storage.sol";
 import "../upgradable/Proxy.sol";
 
 
-contract LANDProxy is Storage, Proxy {
+contract SPACEProxy is Storage, Proxy {
 }

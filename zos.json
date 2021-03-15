@@ -1,7 +1,7 @@
 {
-  "name": "estateregistry",
+  "name": "sectorregistry",
   "version": "0.1.0",
   "contracts": {
-    "EstateRegistry": "EstateRegistry"
+    "SectorRegistry": "SectorRegistry"
   }
 }

@@ -1,8 +1,8 @@
 import assertRevert from './helpers/assertRevert'
 const BigNumber = web3.BigNumber
 
-const LANDRegistry = artifacts.require('LANDRegistry')
-const LANDProxy = artifacts.require('LANDProxy')
+const SPACERegistry = artifacts.require('SPACERegistry')
+const SPACEProxy = artifacts.require('SPACEProxy')
 
 function checkUpgradeLog(log, newContract, initializedWith) {
   log.event.should.be.eq('Upgrade')
@@ -15,11 +15,11 @@ require('chai')
   .use(require('chai-bignumber')(BigNumber))
   .should()
 
-contract('LANDProxy', accounts => {
+contract('SPACEProxy', accounts => {
   const [creator, hacker, otherOwner] = accounts
   let registry = null
   let proxy = null
-  let land = null
+  let space = null
 
   const creationParams = {
     gas: 7e6,
@@ -29,9 +29,9 @@ contract('LANDProxy', accounts => {
 
   describe('upgrade', () => {
     beforeEach(async function() {
-      proxy = await LANDProxy.new(creationParams)
-      registry = await LANDRegistry.new(creationParams)
-      land = await LANDRegistry.at(proxy.address)
+      proxy = await SPACEProxy.new(creationParams)
+      registry = await SPACERegistry.new(creationParams)
+      space = await SPACERegistry.at(proxy.address)
     })
 
     it('should upgrade proxy by owner', async () => {
@@ -42,13 +42,13 @@ contract('LANDProxy', accounts => {
       )
       await checkUpgradeLog(logs[0], registry.address, creator)
 
-      const landName = await land.name()
-      landName.should.be.equal('Decentraland LAND')
+      const spaceName = await space.name()
+      spaceName.should.be.equal('Decentraspace SPACE')
 
-      const proxyOwner = await land.proxyOwner()
+      const proxyOwner = await space.proxyOwner()
       proxyOwner.should.be.equal(creator)
 
-      const ownerAddress = await land.owner()
+      const ownerAddress = await space.owner()
       ownerAddress.should.be.equal(creator)
     })
 

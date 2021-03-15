@@ -1,6 +1,6 @@
 const utils = require('./utils')
 
-const LANDTerraformSale = artifacts.require('../contracts/LANDTerraformSale.sol')
+const SPACETerraformSale = artifacts.require('../contracts/SPACETerraformSale.sol')
 
 const assert = (condition, message) => {
   if (!condition) {
@@ -12,17 +12,17 @@ const run = async () => {
   const filename = './ops/config.testnet.json'
   const input = utils.readJSON(filename)
 
-  assert(input.MANATokenAddress, 'Missing MANAToken address')
+  assert(input.SATYRNTokenAddress, 'Missing SATYRNToken address')
   assert(input.terraformReserveAddress, 'Missing TerraformReserve address')
   assert(input.returnVestingRegistryAddress, 'Missing ReturnVestingRegistry address')
 
-  console.log(`Deploying contract: LANDTerraformSale`)
-  console.log(`  MANAToken: ${input.MANATokenAddress}`)
+  console.log(`Deploying contract: SPACETerraformSale`)
+  console.log(`  SATYRNToken: ${input.SATYRNTokenAddress}`)
   console.log(`  TerraformReserve: ${input.terraformReserveAddress}`)
   console.log(`  ReturnVestingRegistry: ${input.returnVestingRegistryAddress}`)
 
-  const sale = await LANDTerraformSale.new(
-    input.MANATokenAddress,
+  const sale = await SPACETerraformSale.new(
+    input.SATYRNTokenAddress,
     input.terraformReserveAddress,
     input.returnVestingRegistryAddress,
     {gas: 4000000, gasPrice: 100e9}

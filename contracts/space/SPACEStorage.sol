@@ -1,10 +1,10 @@
 pragma solidity ^0.4.23;
 
-import "../estate/IEstateRegistry.sol";
+import "../sector/ISectorRegistry.sol";
 import "../minimeToken/IMinimeToken.sol";
 
 
-contract LANDStorage {
+contract SPACEStorage {
   mapping (address => uint) public latestPing;
 
   uint256 constant clearLow = 0xffffffffffffffffffffffffffffffff00000000000000000000000000000000;
@@ -15,14 +15,14 @@ contract LANDStorage {
 
   mapping (uint256 => address) public updateOperator;
 
-  IEstateRegistry public estateRegistry;
+  ISectorRegistry public sectorRegistry;
 
   mapping (address => bool) public authorizedDeploy;
 
   mapping(address => mapping(address => bool)) public updateManager;
 
-  // Land balance minime token
-  IMiniMeToken public landBalance;
+  // Space balance minime token
+  IMiniMeToken public spaceBalance;
 
   // Registered balance accounts
   mapping(address => bool) public registeredBalance;

@@ -5,15 +5,15 @@ const {
   getFailedTransactions,
   waitForTransaction
 } = require('./utils')
-const { LANDRegistry, EstateRegistry } = require('./contractHelpers')
+const { SPACERegistry, SectorRegistry } = require('./contractHelpers')
 
-const MAX_LAND_PER_TX = 10
+const MAX_SPACE_PER_TX = 10
 const BATCH_SIZE = 1
-const REQUIRED_ARGS = ['account', 'estateId', 'parcels']
+const REQUIRED_ARGS = ['account', 'sectorId', 'parcels']
 
-async function addLandToEstate(allParcels, estateId, options, contracts) {
+async function addSpaceToSector(allParcels, sectorId, options, contracts) {
   let { batchSize, retryFailedTxs } = options
-  const { landRegistry, estateRegistry, web3 } = contracts
+  const { spaceRegistry, sectorRegistry, web3 } = contracts
 
   const parcels = []
   let parcelsAdded = 0
@@ -22,20 +22,20 @@ async function addLandToEstate(allParcels, estateId, options, contracts) {
 
   batchSize = batchSize || BATCH_SIZE
 
-  log.info(`Checking the owner of the estate ${estateId}`)
-  const estateOwner = await estateRegistry.getCurrentOwner(estateId)
-  if (estateOwner !== landRegistry.account) {
+  log.info(`Checking the owner of the sector ${sectorId}`)
+  const sectorOwner = await sectorRegistry.getCurrentOwner(sectorId)
+  if (sectorOwner !== spaceRegistry.account) {
     throw new Error(
-      `Owner "${estateOwner}" of ${estateId} isn't the current account`
+      `Owner "${sectorOwner}" of ${sectorId} isn't the current account`
     )
   }
 
   log.info(`Checking the owners of ${allParcels.length} parcels`)
   for (const parcel of allParcels) {
-    log.debug(`Getting on chain owner for parcel ${parcel.x},${parcel.y}`)
+    log.debug(`Getting on chain owner for parcel ${parcel.x},${parcel.y},${parcel.z}`)
 
-    const owner = await landRegistry.getCurrentOwner(parcel)
-    if (owner === landRegistry.account) {
+    const owner = await spaceRegistry.getCurrentOwner(parcel)
+    if (owner === spaceRegistry.account) {
       parcels.push(parcel)
     } else {
       log.debug(
@@ -47,16 +47,16 @@ async function addLandToEstate(allParcels, estateId, options, contracts) {
 
   while (parcelsAdded < parcels.length) {
     const start = parcelsAdded
-    const end = parcelsAdded + MAX_LAND_PER_TX
+    const end = parcelsAdded + MAX_SPACE_PER_TX
     const parcelsToAdd = parcels.slice(start, end)
 
     log.debug(`Assigning parcels from ${start} to ${end}`)
-    const hash = await landRegistry.transferManyLandToEstate(
+    const hash = await spaceRegistry.transferManySpaceToSector(
       parcelsToAdd,
-      estateId
+      sectorId
     )
     log.info(
-      `Assigned ${parcelsToAdd.length} parcels to estate ${estateId}: ${hash}`
+      `Assigned ${parcelsToAdd.length} parcels to sector ${sectorId}: ${hash}`
     )
 
     runningTransactions.push({ hash, data: parcelsToAdd, status: 'pending' })
@@ -68,7 +68,7 @@ async function addLandToEstate(allParcels, estateId, options, contracts) {
       runningTransactions = []
     }
 
-    parcelsAdded += MAX_LAND_PER_TX
+    parcelsAdded += MAX_SPACE_PER_TX
   }
 
   if (runningTransactions.length > 0) {
@@ -92,39 +92,39 @@ async function addLandToEstate(allParcels, estateId, options, contracts) {
       (allParcels, tx) => allParcels.concat(tx.data),
       []
     )
-    return await addLandToEstate(parcels, estateId, options, contracts)
+    return await addSpaceToSector(parcels, sectorId, options, contracts)
   } else {
     log.info(`Failed transactions: ${failedTransactions.map(t => t.hash)}`)
   }
 }
 
 async function run(args, configuration) {
-  const { account, password, estateId, parcels } = args
+  const { account, password, sectorId, parcels } = args
   const { batchSize, retryFailedTxs } = args
   const { txConfig, contractAddresses } = configuration
   const {
-    LANDRegistry: landRegistryAddress,
-    EstateRegistry: estateRegistryAddress
+    SPACERegistry: spaceRegistryAddress,
+    SectorRegistry: sectorRegistryAddress
   } = contractAddresses
 
-  landRegistry = new LANDRegistry(account, landRegistryAddress, txConfig)
-  await landRegistry.setContract(artifacts)
+  spaceRegistry = new SPACERegistry(account, spaceRegistryAddress, txConfig)
+  await spaceRegistry.setContract(artifacts)
 
-  estateRegistry = new EstateRegistry(account, estateRegistryAddress, txConfig)
-  await estateRegistry.setContract(artifacts)
+  sectorRegistry = new SectorRegistry(account, sectorRegistryAddress, txConfig)
+  await sectorRegistry.setContract(artifacts)
 
   await unlockWeb3Account(web3, account, password)
 
   try {
-    await addLandToEstate(
+    await addSpaceToSector(
       parcels,
-      estateId,
+      sectorId,
       { batchSize: +batchSize, retryFailedTxs },
-      { landRegistry, estateRegistry, web3 }
+      { spaceRegistry, sectorRegistry, web3 }
     )
   } catch (error) {
     log.error(
-      'An error occurred trying to transfer the parcels. Check the `estateId`!'
+      'An error occurred trying to transfer the parcels. Check the `sectorId`!'
     )
     throw error
   }
@@ -132,14 +132,14 @@ async function run(args, configuration) {
 
 const scriptRunner = new ScriptRunner({
   onHelp: () =>
-    console.log(`Add LAND to an already created Estate. To run, use:
+    console.log(`Add SPACE to an already created Sector. To run, use:
 
-truffle exec addLandToEstate.js --estateId 22 --parcels genesis.json --account 0x --password 123 --network ropsten (...)
+truffle exec addSpaceToSector.js --sectorId 22 --parcels genesis.json --account 0x --password 123 --network ropsten (...)
 
 Available flags:
 
---estateId 22            - Blockchain estate id. Required
---parcels genesis.json   - List of parcels to add to the estate. It'll be truncated if it's longer than ${MAX_LAND_PER_TX}
+--sectorId 22            - Blockchain sector id. Required
+--parcels genesis.json   - List of parcels to add to the sector. It'll be truncated if it's longer than ${MAX_SPACE_PER_TX}
 --account 0xdeadbeef     - Which account to use to deploy. Required
 --password S0m3P4ss      - Password for the account.
 --batchSize 50           - Simultaneous transactions. Default ${BATCH_SIZE}
@@ -152,5 +152,5 @@ Available flags:
 
 // This enables the script to be executed by `truffle exec` and to be exported
 const runner = scriptRunner.getRunner(process.argv, REQUIRED_ARGS)
-runner.addLandToEstate = addLandToEstate
+runner.addSpaceToSector = addSpaceToSector
 module.exports = runner

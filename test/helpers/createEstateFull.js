@@ -1,4 +1,4 @@
-export default async function createEstateFull(
+export default async function createSectorFull(
   contracts,
   xs,
   ys,
@@ -6,16 +6,16 @@ export default async function createEstateFull(
   metadata,
   sendParams
 ) {
-  const { land, estate } = contracts
+  const { space, sector } = contracts
 
   if (metadata) {
-    await land.createEstateWithMetadata(xs, ys, owner, metadata, sendParams)
+    await space.createSectorWithMetadata(xs, ys, owner, metadata, sendParams)
   } else {
-    await land.createEstate(xs, ys, owner, sendParams)
+    await space.createSector(xs, ys, owner, sendParams)
   }
 
-  const tokenCount = await estate.balanceOf.call(owner)
-  const token = await estate.tokenOfOwnerByIndex(
+  const tokenCount = await sector.balanceOf.call(owner)
+  const token = await sector.tokenOfOwnerByIndex(
     owner,
     tokenCount.toNumber() - 1
   )

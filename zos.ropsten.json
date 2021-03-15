@@ -1,6 +1,6 @@
 {
   "contracts": {
-    "EstateRegistry": {
+    "SectorRegistry": {
       "address": "0x60e315992d5e62457215dd1e6a49d1ceb7983dfc",
       "constructorCode": "608060405234801561001057600080fd5b5061472b806100206000396000f300",
       "bodyBytecodeHash": "feb3c5bfb51e2100b1a1246dc4f4dff980a171c49c203a74491cf2e9f83640b1",
@@ -8,7 +8,7 @@
     }
   },
   "proxies": {
-    "EstateRegistry": [
+    "SectorRegistry": [
       {
         "address": "0x124bf28a423b2ca80b3846c3aa0eb944fe7ebb95",
         "version": "0.1.0",

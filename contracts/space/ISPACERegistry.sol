@@ -1,30 +1,30 @@
 pragma solidity ^0.4.18;
 
-interface ILANDRegistry {
+interface ISPACERegistry {
 
-  // LAND can be assigned by the owner
+  // SPACE can be assigned by the owner
   function assignNewParcel(int x, int y, address beneficiary) external;
   function assignMultipleParcels(int[] x, int[] y, address beneficiary) external;
 
-  // After one year, LAND can be claimed from an inactive public key
+  // After one year, SPACE can be claimed from an inactive public key
   function ping() external;
 
-  // LAND-centric getters
+  // SPACE-centric getters
   function encodeTokenId(int x, int y) external pure returns (uint256);
   function decodeTokenId(uint value) external pure returns (int, int);
   function exists(int x, int y) external view returns (bool);
-  function ownerOfLand(int x, int y) external view returns (address);
-  function ownerOfLandMany(int[] x, int[] y) external view returns (address[]);
+  function ownerOfSpace(int x, int y) external view returns (address);
+  function ownerOfSpaceMany(int[] x, int[] y) external view returns (address[]);
   function landOf(address owner) external view returns (int[], int[]);
   function landData(int x, int y) external view returns (string);
 
-  // Transfer LAND
-  function transferLand(int x, int y, address to) external;
-  function transferManyLand(int[] x, int[] y, address to) external;
+  // Transfer SPACE
+  function transferSpace(int x, int y, address to) external;
+  function transferManySpace(int[] x, int[] y, address to) external;
 
-  // Update LAND
-  function updateLandData(int x, int y, string data) external;
-  function updateManyLandData(int[] x, int[] y, string data) external;
+  // Update SPACE
+  function updateSpaceData(int x, int y, string data) external;
+  function updateManySpaceData(int[] x, int[] y, string data) external;
 
   // Authorize an updateManager to manage parcel data
   function setUpdateManager(address _owner, address _operator, bool _approved) external;
@@ -60,8 +60,8 @@ interface ILANDRegistry {
     address indexed _deployer
   );
 
-  event SetLandBalanceToken(
-    address indexed _previousLandBalance,
-    address indexed _newLandBalance
+  event SetSpaceBalanceToken(
+    address indexed _previousSpaceBalance,
+    address indexed _newSpaceBalance
   );
 }

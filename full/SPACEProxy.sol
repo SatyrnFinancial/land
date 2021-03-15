@@ -68,28 +68,28 @@ contract AssetRegistryStorage {
   mapping(uint256 => address) internal _approval;
 }
 
-// File: contracts/estate/IEstateRegistry.sol
+// File: contracts/sector/ISectorRegistry.sol
 
-contract IEstateRegistry {
+contract ISectorRegistry {
   function mint(address to, string metadata) external returns (uint256);
   function ownerOf(uint256 _tokenId) public view returns (address _owner); // from ERC721
 
   // Events
 
-  event CreateEstate(
+  event CreateSector(
     address indexed _owner,
-    uint256 indexed _estateId,
+    uint256 indexed _sectorId,
     string _data
   );
 
-  event AddLand(
-    uint256 indexed _estateId,
-    uint256 indexed _landId
+  event AddSpace(
+    uint256 indexed _sectorId,
+    uint256 indexed _spaceId
   );
 
-  event RemoveLand(
-    uint256 indexed _estateId,
-    uint256 indexed _landId,
+  event RemoveSpace(
+    uint256 indexed _sectorId,
+    uint256 indexed _spaceId,
     address indexed _destinatary
   );
 
@@ -101,7 +101,7 @@ contract IEstateRegistry {
   );
 
   event UpdateOperator(
-    uint256 indexed _estateId,
+    uint256 indexed _sectorId,
     address indexed _operator
   );
 
@@ -112,13 +112,13 @@ contract IEstateRegistry {
     bool _approved
   );
 
-  event SetLANDRegistry(
+  event SetSPACERegistry(
     address indexed _registry
   );
 
-  event SetEstateLandBalanceToken(
-    address indexed _previousEstateLandBalance,
-    address indexed _newEstateLandBalance
+  event SetSectorSpaceBalanceToken(
+    address indexed _previousSectorSpaceBalance,
+    address indexed _newSectorSpaceBalance
   );
 }
 
@@ -149,9 +149,9 @@ interface IMiniMeToken {
     event Transfer(address indexed _from, address indexed _to, uint256 _amount);
 }
 
-// File: contracts/land/LANDStorage.sol
+// File: contracts/space/SPACEStorage.sol
 
-contract LANDStorage {
+contract SPACEStorage {
   mapping (address => uint) public latestPing;
 
   uint256 constant clearLow = 0xffffffffffffffffffffffffffffffff00000000000000000000000000000000;
@@ -162,14 +162,14 @@ contract LANDStorage {
 
   mapping (uint256 => address) public updateOperator;
 
-  IEstateRegistry public estateRegistry;
+  ISectorRegistry public sectorRegistry;
 
   mapping (address => bool) public authorizedDeploy;
 
   mapping(address => mapping(address => bool)) public updateManager;
 
-  // Land balance minime token
-  IMiniMeToken public landBalance;
+  // Space balance minime token
+  IMiniMeToken public spaceBalance;
 
   // Registered balance accounts
   mapping(address => bool) public registeredBalance;
@@ -177,7 +177,7 @@ contract LANDStorage {
 
 // File: contracts/Storage.sol
 
-contract Storage is ProxyStorage, OwnableStorage, AssetRegistryStorage, LANDStorage {
+contract Storage is ProxyStorage, OwnableStorage, AssetRegistryStorage, SPACEStorage {
 }
 
 // File: contracts/upgradable/Ownable.sol
@@ -285,7 +285,7 @@ contract Proxy is Storage, DelegateProxy, Ownable {
   }
 }
 
-// File: contracts/upgradable/LANDProxy.sol
+// File: contracts/upgradable/SPACEProxy.sol
 
-contract LANDProxy is Storage, Proxy {
+contract SPACEProxy is Storage, Proxy {
 }

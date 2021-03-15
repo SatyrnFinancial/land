@@ -8,21 +8,21 @@ import "../upgradable/IApplication.sol";
 
 import "erc821/contracts/FullAssetRegistry.sol";
 
-import "./ILANDRegistry.sol";
+import "./ISPACERegistry.sol";
 
 import "../metadata/IMetadataHolder.sol";
 
-import "../estate/IEstateRegistry.sol";
+import "../sector/ISectorRegistry.sol";
 
 
 /* solium-disable function-order */
-contract LANDRegistry is Storage, Ownable, FullAssetRegistry, ILANDRegistry {
+contract SPACERegistry is Storage, Ownable, FullAssetRegistry, ISPACERegistry {
   bytes4 constant public GET_METADATA = bytes4(keccak256("getMetadata(uint256)"));
 
   function initialize(bytes) external {
-    _name = "Decentraland LAND";
-    _symbol = "LAND";
-    _description = "Contract that stores the Decentraland LAND registry";
+    _name = "Decentraspace SPACE";
+    _symbol = "SPACE";
+    _description = "Contract that stores the Decentraspace SPACE registry";
   }
 
   modifier onlyProxyOwner() {
@@ -98,18 +98,18 @@ contract LANDRegistry is Storage, Ownable, FullAssetRegistry, ILANDRegistry {
   }
 
   //
-  // LAND Create
+  // SPACE Create
   //
 
   function assignNewParcel(int x, int y, address beneficiary) external onlyDeployer {
     _generate(_encodeTokenId(x, y), beneficiary);
-    _updateLandBalance(address(0), beneficiary);
+    _updateSpaceBalance(address(0), beneficiary);
   }
 
   function assignMultipleParcels(int[] x, int[] y, address beneficiary) external onlyDeployer {
     for (uint i = 0; i < x.length; i++) {
       _generate(_encodeTokenId(x[i], y[i]), beneficiary);
-      _updateLandBalance(address(0), beneficiary);
+      _updateSpaceBalance(address(0), beneficiary);
     }
   }
 
@@ -129,7 +129,7 @@ contract LANDRegistry is Storage, Ownable, FullAssetRegistry, ILANDRegistry {
   }
 
   //
-  // LAND Getters
+  // SPACE Getters
   //
 
   function encodeTokenId(int x, int y) external pure returns (uint) {
@@ -180,27 +180,27 @@ contract LANDRegistry is Storage, Ownable, FullAssetRegistry, ILANDRegistry {
     return _exists(_encodeTokenId(x, y));
   }
 
-  function ownerOfLand(int x, int y) external view returns (address) {
-    return _ownerOfLand(x, y);
+  function ownerOfSpace(int x, int y) external view returns (address) {
+    return _ownerOfSpace(x, y);
   }
 
-  function _ownerOfLand(int x, int y) internal view returns (address) {
+  function _ownerOfSpace(int x, int y) internal view returns (address) {
     return _ownerOf(_encodeTokenId(x, y));
   }
 
-  function ownerOfLandMany(int[] x, int[] y) external view returns (address[]) {
+  function ownerOfSpaceMany(int[] x, int[] y) external view returns (address[]) {
     require(x.length > 0, "You should supply at least one coordinate");
     require(x.length == y.length, "The coordinates should have the same length");
 
     address[] memory addrs = new address[](x.length);
     for (uint i = 0; i < x.length; i++) {
-      addrs[i] = _ownerOfLand(x[i], y[i]);
+      addrs[i] = _ownerOfSpace(x[i], y[i]);
     }
 
     return addrs;
   }
 
-  function landOf(address owner) external view returns (int[], int[]) {
+  function spaceOf(address owner) external view returns (int[], int[]) {
     uint256 len = _assetsOf[owner].length;
     int[] memory x = new int[](len);
     int[] memory y = new int[](len);
@@ -222,7 +222,7 @@ contract LANDRegistry is Storage, Ownable, FullAssetRegistry, ILANDRegistry {
 
   function _tokenMetadata(uint256 assetId) internal view returns (string) {
     address _owner = _ownerOf(assetId);
-    if (_isContract(_owner) && _owner != address(estateRegistry)) {
+    if (_isContract(_owner) && _owner != address(sectorRegistry)) {
       if ((ERC165(_owner)).supportsInterface(GET_METADATA)) {
         return IMetadataHolder(_owner).getMetadata(assetId);
       }
@@ -230,16 +230,16 @@ contract LANDRegistry is Storage, Ownable, FullAssetRegistry, ILANDRegistry {
     return _assetData[assetId];
   }
 
-  function landData(int x, int y) external view returns (string) {
+  function spaceData(int x, int y) external view returns (string) {
     return _tokenMetadata(_encodeTokenId(x, y));
   }
 
   //
-  // LAND Transfer
+  // SPACE Transfer
   //
 
   function transferFrom(address from, address to, uint256 assetId) external {
-    require(to != address(estateRegistry), "EstateRegistry unsafe transfers are not allowed");
+    require(to != address(sectorRegistry), "SectorRegistry unsafe transfers are not allowed");
     return _doTransferFrom(
       from,
       to,
@@ -249,7 +249,7 @@ contract LANDRegistry is Storage, Ownable, FullAssetRegistry, ILANDRegistry {
     );
   }
 
-  function transferLand(int x, int y, address to) external {
+  function transferSpace(int x, int y, address to) external {
     uint256 tokenId = _encodeTokenId(x, y);
     _doTransferFrom(
       _ownerOf(tokenId),
@@ -260,7 +260,7 @@ contract LANDRegistry is Storage, Ownable, FullAssetRegistry, ILANDRegistry {
     );
   }
 
-  function transferManyLand(int[] x, int[] y, address to) external {
+  function transferManySpace(int[] x, int[] y, address to) external {
     require(x.length > 0, "You should supply at least one coordinate");
     require(x.length == y.length, "The coordinates should have the same length");
 
@@ -276,45 +276,45 @@ contract LANDRegistry is Storage, Ownable, FullAssetRegistry, ILANDRegistry {
     }
   }
 
-  function transferLandToEstate(int x, int y, uint256 estateId) external {
+  function transferSpaceToSector(int x, int y, uint256 sectorId) external {
     require(
-      estateRegistry.ownerOf(estateId) == msg.sender,
-      "You must own the Estate you want to transfer to"
+      sectorRegistry.ownerOfssectorId) == msg.sender,
+      "You must own the Sector you want to transfer to"
     );
 
     uint256 tokenId = _encodeTokenId(x, y);
     _doTransferFrom(
       _ownerOf(tokenId),
-      address(estateRegistry),
+      address(sectorRegistry),
       tokenId,
-      toBytes(estateId),
+      toBytes(sectorId),
       true
     );
   }
 
-  function transferManyLandToEstate(int[] x, int[] y, uint256 estateId) external {
+  function transferManySpaceToSector(int[] x, int[] y, uint256 sectorId) external {
     require(x.length > 0, "You should supply at least one coordinate");
     require(x.length == y.length, "The coordinates should have the same length");
     require(
-      estateRegistry.ownerOf(estateId) == msg.sender,
-      "You must own the Estate you want to transfer to"
+      sectorRegistry.ownerOfssectorId) == msg.sender,
+      "You must own the Sector you want to transfer to"
     );
 
     for (uint i = 0; i < x.length; i++) {
       uint256 tokenId = _encodeTokenId(x[i], y[i]);
       _doTransferFrom(
         _ownerOf(tokenId),
-        address(estateRegistry),
+        address(sectorRegistry),
         tokenId,
-        toBytes(estateId),
+        toBytes(sectorId),
         true
       );
     }
   }
 
   /**
-   * @notice Set LAND updateOperator
-   * @param assetId - LAND id
+   * @notice Set SPACE updateOperator
+   * @param assetId - SPACE id
    * @param operator - address of the account to be set as the updateOperator
    */
   function setUpdateOperator(
@@ -329,8 +329,8 @@ contract LANDRegistry is Storage, Ownable, FullAssetRegistry, ILANDRegistry {
   }
 
   /**
-   * @notice Set many LAND updateOperator
-   * @param _assetIds - LAND ids
+   * @notice Set many SPACE updateOperator
+   * @param _assetIds - SPACE ids
    * @param _operator - address of the account to be set as the updateOperator
    */
   function setManyUpdateOperator(
@@ -369,22 +369,22 @@ contract LANDRegistry is Storage, Ownable, FullAssetRegistry, ILANDRegistry {
   }
 
   //
-  // Estate generation
+  // Sector generation
   //
 
-  event EstateRegistrySet(address indexed registry);
+  event SectorRegistrySet(address indexed registry);
 
-  function setEstateRegistry(address registry) external onlyProxyOwner {
-    estateRegistry = IEstateRegistry(registry);
-    emit EstateRegistrySet(registry);
+  function setSectorRegistry(address registry) external onlyProxyOwner {
+    sectorRegistry = ISectorRegistry(registry);
+    emit SectorRegistrySet(registry);
   }
 
-  function createEstate(int[] x, int[] y, address beneficiary) external returns (uint256) {
+  function createSector(int[] x, int[] y, address beneficiary) external returns (uint256) {
     // solium-disable-next-line arg-overflow
-    return _createEstate(x, y, beneficiary, "");
+    return _createSector(x, y, beneficiary, "");
   }
 
-  function createEstateWithMetadata(
+  function createSectorWithMetadata(
     int[] x,
     int[] y,
     address beneficiary,
@@ -394,10 +394,10 @@ contract LANDRegistry is Storage, Ownable, FullAssetRegistry, ILANDRegistry {
     returns (uint256)
   {
     // solium-disable-next-line arg-overflow
-    return _createEstate(x, y, beneficiary, metadata);
+    return _createSector(x, y, beneficiary, metadata);
   }
 
-  function _createEstate(
+  function _createSector(
     int[] x,
     int[] y,
     address beneficiary,
@@ -408,23 +408,23 @@ contract LANDRegistry is Storage, Ownable, FullAssetRegistry, ILANDRegistry {
   {
     require(x.length > 0, "You should supply at least one coordinate");
     require(x.length == y.length, "The coordinates should have the same length");
-    require(address(estateRegistry) != 0, "The Estate registry should be set");
+    require(address(sectorRegistry) != 0, "The Sector registry should be set");
 
-    uint256 estateTokenId = estateRegistry.mint(beneficiary, metadata);
-    bytes memory estateTokenIdBytes = toBytes(estateTokenId);
+    uint256 sectorTokenId =ssectorRegistry.mint(beneficiary, metadata);
+    bytes memory sectorTokenIdBytes = toBytesssectorTokenId);
 
     for (uint i = 0; i < x.length; i++) {
       uint256 tokenId = _encodeTokenId(x[i], y[i]);
       _doTransferFrom(
         _ownerOf(tokenId),
-        address(estateRegistry),
+        address(sectorRegistry),
         tokenId,
-        estateTokenIdBytes,
+        sectorTokenIdBytes,
         true
       );
     }
 
-    return estateTokenId;
+    return sectorTokenId;
   }
 
   function toBytes(uint256 x) internal pure returns (bytes b) {
@@ -434,20 +434,20 @@ contract LANDRegistry is Storage, Ownable, FullAssetRegistry, ILANDRegistry {
   }
 
   //
-  // LAND Update
+  // SPACE Update
   //
 
-  function updateLandData(
+  function updateSpaceData(
     int x,
     int y,
     string data
   )
     external
   {
-    return _updateLandData(x, y, data);
+    return _updateSpaceData(x, y, data);
   }
 
-  function _updateLandData(
+  function _updateSpaceData(
     int x,
     int y,
     string data
@@ -468,37 +468,37 @@ contract LANDRegistry is Storage, Ownable, FullAssetRegistry, ILANDRegistry {
     );
   }
 
-  function updateManyLandData(int[] x, int[] y, string data) external {
+  function updateManySpaceData(int[] x, int[] y, string data) external {
     require(x.length > 0, "You should supply at least one coordinate");
     require(x.length == y.length, "The coordinates should have the same length");
     for (uint i = 0; i < x.length; i++) {
-      _updateLandData(x[i], y[i], data);
+      _updateSpaceData(x[i], y[i], data);
     }
   }
 
   /**
-   * @dev Set a new land balance minime token
-   * @notice Set new land balance token: `_newLandBalance`
-   * @param _newLandBalance address of the new land balance token
+   * @dev Set a new space balance minime token
+   * @notice Set new space balance token: `_newSpaceBalance`
+   * @param _newSpaceBalance address of the new space balance token
    */
-  function setLandBalanceToken(address _newLandBalance) onlyProxyOwner external {
-    require(_newLandBalance != address(0), "New landBalance should not be zero address");
-    emit SetLandBalanceToken(landBalance, _newLandBalance);
-    landBalance = IMiniMeToken(_newLandBalance);
+  function setSpaceBalanceToken(address _newSpaceBalance) onlyProxyOwner external {
+    require(_newSpaceBalance != address(0), "New spaceBalance should not be zero address");
+    emit SetSpaceBalanceToken(spaceBalance, _newSpaceBalance);
+    spaceBalance = IMiniMeToken(_newSpaceBalance);
   }
 
    /**
    * @dev Register an account balance
-   * @notice Register land Balance
+   * @notice Register space Balance
    */
   function registerBalance() external {
     require(!registeredBalance[msg.sender], "Register Balance::The user is already registered");
 
     // Get balance of the sender
-    uint256 currentBalance = landBalance.balanceOf(msg.sender);
+    uint256 currentBalance = spaceBalance.balanceOf(msg.sender);
     if (currentBalance > 0) {
       require(
-        landBalance.destroyTokens(msg.sender, currentBalance),
+        spaceBalance.destroyTokens(msg.sender, currentBalance),
         "Register Balance::Could not destroy tokens"
       );
     }
@@ -506,19 +506,19 @@ contract LANDRegistry is Storage, Ownable, FullAssetRegistry, ILANDRegistry {
     // Set balance as registered
     registeredBalance[msg.sender] = true;
 
-    // Get LAND balance
+    // Get SPACE balance
     uint256 newBalance = _balanceOf(msg.sender);
 
     // Generate Tokens
     require(
-      landBalance.generateTokens(msg.sender, newBalance),
+      spaceBalance.generateTokens(msg.sender, newBalance),
       "Register Balance::Could not generate tokens"
     );
   }
 
   /**
    * @dev Unregister an account balance
-   * @notice Unregister land Balance
+   * @notice Unregister space Balance
    */
   function unregisterBalance() external {
     require(registeredBalance[msg.sender], "Unregister Balance::The user not registered");
@@ -527,11 +527,11 @@ contract LANDRegistry is Storage, Ownable, FullAssetRegistry, ILANDRegistry {
     registeredBalance[msg.sender] = false;
 
     // Get balance
-    uint256 currentBalance = landBalance.balanceOf(msg.sender);
+    uint256 currentBalance = spaceBalance.balanceOf(msg.sender);
 
     // Destroy Tokens
     require(
-      landBalance.destroyTokens(msg.sender, currentBalance),
+      spaceBalance.destroyTokens(msg.sender, currentBalance),
       "Unregister Balance::Could not destroy tokens"
     );
   }
@@ -546,7 +546,7 @@ contract LANDRegistry is Storage, Ownable, FullAssetRegistry, ILANDRegistry {
     internal
   {
     updateOperator[assetId] = address(0);
-    _updateLandBalance(from, to);
+    _updateSpaceBalance(from, to);
     super._doTransferFrom(
       from,
       to,
@@ -568,13 +568,13 @@ contract LANDRegistry is Storage, Ownable, FullAssetRegistry, ILANDRegistry {
    * @param _from account
    * @param _to account
    */
-  function _updateLandBalance(address _from, address _to) internal {
+  function _updateSpaceBalance(address _from, address _to) internal {
     if (registeredBalance[_from]) {
-      landBalance.destroyTokens(_from, 1);
+      spaceBalance.destroyTokens(_from, 1);
     }
 
     if (registeredBalance[_to]) {
-      landBalance.generateTokens(_to, 1);
+      spaceBalance.generateTokens(_to, 1);
     }
   }
 }

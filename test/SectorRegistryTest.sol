@@ -1,8 +1,8 @@
 pragma solidity ^0.4.22;
 
-import '../contracts/estate/EstateRegistry.sol';
+import '../contracts/sector/SectorRegistry.sol';
 
-contract EstateRegistryTest is EstateRegistry {
+contract SectorRegistryTest is SectorRegistry {
   constructor(
     string _name,
     string _symbol,
@@ -10,11 +10,11 @@ contract EstateRegistryTest is EstateRegistry {
   )
     public
   {
-    EstateRegistry.initialize(_name, _symbol, _registry);
+    SectorRegistry.initialize(_name, _symbol, _registry);
   }
 
-  function mintEstate(address to, string metadata) public returns (uint256) {
-    return _mintEstate(to, metadata);
+  function mintSector(address to, string metadata) public returns (uint256) {
+    return _mintSector(to, metadata);
   }
 
   function getMetadataInterfaceId() public pure returns (bytes4) {
@@ -45,7 +45,7 @@ contract EstateRegistryTest is EstateRegistry {
     );
   }
 
-  function setEstateLandBalance(address _newEstateLandBalance) public {
-    _setEstateLandBalanceToken(_newEstateLandBalance);
+  function setSectorSpaceBalance(address _newSectorSpaceBalance) public {
+    _setSectorSpaceBalanceToken(_newSectorSpaceBalance);
   }
 }

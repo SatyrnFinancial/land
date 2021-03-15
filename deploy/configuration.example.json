@@ -1,7 +1,7 @@
 {
   "contractAddresses": {
-    "LANDRegistry": "0x7...",
-    "EstateRegistry": "0x1..."
+    "SPACERegistry": "0x7...",
+    "SectorRegistry": "0x1..."
   },
   "txConfig": {
     "gasPrice": 27000000000,

@@ -1,7 +1,7 @@
-const LANDRegistry = require('./LANDRegistry')
-const EstateRegistry = require('./EstateRegistry')
+const SPACERegistry = require('./SPACERegistry')
+const SectorRegistry = require('./SectorRegistry')
 
 module.exports = {
-  LANDRegistry,
-  EstateRegistry
+  SPACERegistry,
+  SectorRegistry
 }

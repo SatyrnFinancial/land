@@ -5,23 +5,23 @@ const {
   getFailedTransactions,
   isEmptyAddress
 } = require('./utils')
-const { LANDRegistry } = require('./contractHelpers')
+const { SPACERegistry } = require('./contractHelpers')
 
-const LANDS_PER_ASSIGN = 50
+const SPACES_PER_ASSIGN = 50
 const BATCH_SIZE = 1
 const REQUIRED_ARGS = ['parcels', 'account', 'owner']
 
 /* TX = { hash, data, status } */
 async function assignParcels(parcels, newOwner, options, contracts) {
-  let { batchSize, landsPerAssign, retryFailedTxs } = options
-  const { landRegistry, web3 } = contracts
+  let { batchSize, spacesPerAssign, retryFailedTxs } = options
+  const { spaceRegistry, web3 } = contracts
 
   let runningTransactions = []
   let failedTransactions = []
   let parcelsToAssign = []
 
   batchSize = batchSize || BATCH_SIZE
-  landsPerAssign = landsPerAssign || LANDS_PER_ASSIGN
+  spacesPerAssign = spacesPerAssign || SPACES_PER_ASSIGN
 
   log.debug(`Setting the owner of ${parcels.length} parcels as ${newOwner}`)
 
@@ -32,24 +32,24 @@ async function assignParcels(parcels, newOwner, options, contracts) {
       )
     }
 
-    log.debug(`Getting on chain owner for parcel ${parcel.x},${parcel.y}`)
-    const owner = await landRegistry.getCurrentOwner(parcel)
+    log.debug(`Getting on chain owner for parcel ${parcel.x},${parcel.y},${parcel.z}`)
+    const owner = await spaceRegistry.getCurrentOwner(parcel)
 
     if (isEmptyAddress(owner)) {
-      log.debug(`Empty owner for ${parcel.x},${parcel.y}, will be assigned`)
+      log.debug(`Empty owner for ${parcel.x},${parcel.y},${parcel.z}, will be assigned`)
     } else {
-      log.warn(`${parcel.x},${parcel.y} already has ${owner} as owner!`)
+      log.warn(`${parcel.x},${parcel.y},${parcel.z} already has ${owner} as owner!`)
       continue
     }
 
     parcelsToAssign.push(parcel)
 
-    // Assign `landsPerAssign` parcels
-    if (parcelsToAssign.length >= landsPerAssign) {
+    // Assign `spacesPerAssign` parcels
+    if (parcelsToAssign.length >= spacesPerAssign) {
       const transaction = await assignMultipleParcels(
         parcelsToAssign,
         newOwner,
-        landRegistry
+        spaceRegistry
       )
       runningTransactions.push(transaction)
       parcelsToAssign = []
@@ -69,7 +69,7 @@ async function assignParcels(parcels, newOwner, options, contracts) {
     const transaction = await assignMultipleParcels(
       parcelsToAssign,
       newOwner,
-      landRegistry
+      spaceRegistry
     )
     runningTransactions.push(transaction)
     failedTransactions = failedTransactions.concat(
@@ -98,8 +98,8 @@ async function assignParcels(parcels, newOwner, options, contracts) {
   }
 }
 
-async function assignMultipleParcels(parcelsToAssign, newOwner, landRegistry) {
-  const hash = await landRegistry.assignMultipleParcels(
+async function assignMultipleParcels(parcelsToAssign, newOwner, spaceRegistry) {
+  const hash = await spaceRegistry.assignMultipleParcels(
     parcelsToAssign,
     newOwner
   )
@@ -111,20 +111,20 @@ async function assignMultipleParcels(parcelsToAssign, newOwner, landRegistry) {
 
 async function run(args, configuration) {
   const { account, password, owner, parcels } = args
-  const { batchSize, landsPerAssign, retryFailedTxs } = args
+  const { batchSize, spacesPerAssign, retryFailedTxs } = args
   const { txConfig, contractAddresses } = configuration
-  const { LANDRegistry: landRegistryAddress } = contractAddresses
+  const { SPACERegistry: spaceRegistryAddress } = contractAddresses
 
-  const landRegistry = new LANDRegistry(account, landRegistryAddress, txConfig)
-  await landRegistry.setContract(artifacts)
+  const spaceRegistry = new SPACERegistry(account, spaceRegistryAddress, txConfig)
+  await spaceRegistry.setContract(artifacts)
 
   await unlockWeb3Account(web3, account, password)
 
   await assignParcels(
     parcels,
     owner,
-    { batchSize: +batchSize, landsPerAssign: +landsPerAssign, retryFailedTxs },
-    { landRegistry, web3 }
+    { batchSize: +batchSize, spacesPerAssign: +spacesPerAssign, retryFailedTxs },
+    { spaceRegistry, web3 }
   )
 }
 
@@ -141,7 +141,7 @@ Available flags:
 --password S0m3P4ss      - Password for the account.
 --owner 0xdeadbeef       - The new owner to be used. Required
 --batchSize 50           - Simultaneous transactions. Default ${BATCH_SIZE}
---landsPerAssign 50      - Parcels per assign transaction. Default ${LANDS_PER_ASSIGN}
+--spacesPerAssign 50      - Parcels per assign transaction. Default ${SPACES_PER_ASSIGN}
 --retryFailedTxs         - If this flag is present, the script will try to retry failed transactions
 --logLevel debug         - Log level to use. Possible values: info, debug. Default: info
 

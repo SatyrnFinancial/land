@@ -1,26 +1,26 @@
 pragma solidity ^0.4.22;
 
 
-contract IEstateRegistry {
+contract ISectorRegistry {
   function mint(address to, string metadata) external returns (uint256);
   function ownerOf(uint256 _tokenId) public view returns (address _owner); // from ERC721
 
   // Events
 
-  event CreateEstate(
+  event CreateSector(
     address indexed _owner,
-    uint256 indexed _estateId,
+    uint256 indexed _sectorId,
     string _data
   );
 
-  event AddLand(
-    uint256 indexed _estateId,
-    uint256 indexed _landId
+  event AddSpace(
+    uint256 indexed _sectorId,
+    uint256 indexed _spaceId
   );
 
-  event RemoveLand(
-    uint256 indexed _estateId,
-    uint256 indexed _landId,
+  event RemoveSpace(
+    uint256 indexed _sectorId,
+    uint256 indexed _spaceId,
     address indexed _destinatary
   );
 
@@ -32,7 +32,7 @@ contract IEstateRegistry {
   );
 
   event UpdateOperator(
-    uint256 indexed _estateId,
+    uint256 indexed _sectorId,
     address indexed _operator
   );
 
@@ -43,12 +43,12 @@ contract IEstateRegistry {
     bool _approved
   );
 
-  event SetLANDRegistry(
+  event SetSPACERegistry(
     address indexed _registry
   );
 
-  event SetEstateLandBalanceToken(
-    address indexed _previousEstateLandBalance,
-    address indexed _newEstateLandBalance
+  event SetSectorSpaceBalanceToken(
+    address indexed _previousSectorSpaceBalance,
+    address indexed _newSectorSpaceBalance
   );
 }

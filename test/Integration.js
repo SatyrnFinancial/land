@@ -2,19 +2,19 @@ import assertRevert from './helpers/assertRevert'
 
 const BigNumber = web3.BigNumber
 
-const LANDRegistry = artifacts.require('LANDRegistryTest')
-const LANDProxy = artifacts.require('LANDProxy')
+const SPACERegistry = artifacts.require('SPACERegistryTest')
+const SPACEProxy = artifacts.require('SPACEProxy')
 
 require('chai')
   .use(require('chai-as-promised'))
   .use(require('chai-bignumber')(BigNumber))
   .should()
 
-contract('LANDRegistry', accounts => {
+contract('SPACERegistry', accounts => {
   const [creator, user, anotherUser] = accounts
   let registry = null
   let proxy = null
-  let land = null
+  let space = null
 
   const sentByUser = { from: user }
   const sentByCreator = { from: creator }
@@ -25,27 +25,27 @@ contract('LANDRegistry', accounts => {
   }
 
   beforeEach(async function() {
-    proxy = await LANDProxy.new(creationParams)
-    registry = await LANDRegistry.new(creationParams)
+    proxy = await SPACEProxy.new(creationParams)
+    registry = await SPACERegistry.new(creationParams)
 
     await proxy.upgrade(registry.address, creator, sentByCreator)
-    land = await LANDRegistry.at(proxy.address)
-    await land.initialize(creator, sentByCreator)
-    await land.authorizeDeploy(creator, sentByCreator)
-    await land.ping(sentByUser)
+    space = await SPACERegistry.at(proxy.address)
+    await space.initialize(creator, sentByCreator)
+    await space.authorizeDeploy(creator, sentByCreator)
+    await space.ping(sentByUser)
   })
 
   async function assign({ to, asset, initialValue }) {
-    await land.assignNewParcel(0, asset, to, sentByCreator)
-    await land.updateLandData(0, asset, initialValue, { from: to })
+    await space.assignNewParcel(0, asset, to, sentByCreator)
+    await space.updateSpaceData(0, asset, initialValue, { from: to })
   }
 
   async function transfer({ from, to, asset }) {
-    await land.transferLand(0, asset, to, { from })
+    await space.transferSpace(0, asset, to, { from })
   }
 
   async function update({ from, asset, value }) {
-    await land.updateLandData(0, asset, value, { from })
+    await space.updateSpaceData(0, asset, value, { from })
   }
 
   const assetOne = 1

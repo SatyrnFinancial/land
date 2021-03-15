@@ -1,13 +1,13 @@
 #! /bin/bash
 
-REGISTRY=LANDRegistry.sol
-PROXY=LANDProxy.sol
-ESTATE_REGISTRY=EstateRegistry.sol
+REGISTRY=SPACERegistry.sol
+PROXY=SPACEProxy.sol
+SECTOR_REGISTRY=SectorRegistry.sol
 
 
 OUTPUT=full
 
-npx truffle-flattener contracts/land/$REGISTRY > $OUTPUT/$REGISTRY
+npx truffle-flattener contracts/space/$REGISTRY > $OUTPUT/$REGISTRY
 npx truffle-flattener contracts/upgradable/$PROXY > $OUTPUT/$PROXY
-npx truffle-flattener contracts/estate/$ESTATE_REGISTRY > $OUTPUT/$ESTATE_REGISTRY
+npx truffle-flattener contracts/sector/$SECTOR_REGISTRY > $OUTPUT/$SECTOR_REGISTRY
 

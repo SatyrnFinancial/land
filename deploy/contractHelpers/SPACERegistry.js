@@ -1,7 +1,7 @@
 const { GAS_PRICE, GAS_LIMIT } = require('./txParams')
 const { log } = require('../utils')
 
-class LANDRegistry {
+class SPACERegistry {
   constructor(account, address, txConfig = {}) {
     this.address = address
     this.account = account
@@ -16,13 +16,13 @@ class LANDRegistry {
   }
 
   async setContract(artifacts) {
-    const artifact = artifacts.require('LANDRegistry')
+    const artifact = artifacts.require('SPACERegistry')
     this.contract = await artifact.at(this.address)
     return this
   }
 
   async getCurrentOwner(parcel) {
-    return await this.contract.ownerOfLand(parcel.x, parcel.y, this.txConfig)
+    return await this.contract.ownerOfSpace(parcel.x, parcel.y,parcel.z, this.txConfig)
   }
 
   async assignMultipleParcels(parcels, newOwner) {
@@ -37,12 +37,12 @@ class LANDRegistry {
     )
   }
 
-  async createEstate(parcels, owner, data = '') {
+  async createSector(parcels, owner, data = '') {
     const { xs, ys } = this.getXYPairs(parcels)
 
     if (data) {
-      log.debug('Sending createEstateWithMetadata\n', { xs, ys, owner, data })
-      return this.contract.createEstateWithMetadata.sendTransaction(
+      log.debug('Sending createSectorWithMetadata\n', { xs, ys, owner, data })
+      return this.contract.createSectorWithMetadata.sendTransaction(
         xs,
         ys,
         owner,
@@ -50,8 +50,8 @@ class LANDRegistry {
         this.txConfig
       )
     } else {
-      log.debug('Sending createEstate\n', { xs, ys, owner })
-      return this.contract.createEstate.sendTransaction(
+      log.debug('Sending createSector\n', { xs, ys, owner })
+      return this.contract.createSector.sendTransaction(
         xs,
         ys,
         owner,
@@ -60,14 +60,14 @@ class LANDRegistry {
     }
   }
 
-  async transferManyLandToEstate(parcels, estateId) {
+  async transferManySpaceToSector(parcels, sectorId) {
     const { xs, ys } = this.getXYPairs(parcels)
 
-    log.debug('Sending transferManyLandToEstate\n', { xs, ys, estateId })
-    return await this.contract.transferManyLandToEstate.sendTransaction(
+    log.debug('Sending transferManySpaceToSector\n', { xs, ys, sectorId })
+    return await this.contract.transferManySpaceToSector.sendTransaction(
       xs,
       ys,
-      estateId,
+      sectorId,
       this.txConfig
     )
   }
@@ -78,9 +78,10 @@ class LANDRegistry {
     for (let parcel of parcels) {
       xs.push(parcel.x)
       ys.push(parcel.y)
+      zs.push(parcel.z)
     }
-    return { xs, ys }
+    return { xs, ys ,zs}
   }
 }
 
-module.exports = LANDRegistry
+module.exports = SPACERegistry

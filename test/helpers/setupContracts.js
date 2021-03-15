@@ -1,8 +1,8 @@
-export const ESTATE_NAME = 'Estate'
-export const ESTATE_SYMBOL = 'EST'
+export const SECTOR_NAME = 'Sector'
+export const SECTOR_SYMBOL = 'EST'
 
-export const LAND_NAME = 'Decentraland LAND'
-export const LAND_SYMBOL = 'LAND'
+export const SPACE_NAME = 'Decentraspace SPACE'
+export const SPACE_SYMBOL = 'SPACE'
 
 const EMPTY_ADDRESS = '0x0000000000000000000000000000000000000000'
 
@@ -14,58 +14,58 @@ export default async function setupContracts(creator) {
   }
   const sentByCreator = { ...creationParams, from: creator }
 
-  const LANDRegistry = artifacts.require('LANDRegistryTest')
-  const EstateRegistry = artifacts.require('EstateRegistryTest')
-  const LANDProxy = artifacts.require('LANDProxy')
+  const SPACERegistry = artifacts.require('SPACERegistryTest')
+  const SectorRegistry = artifacts.require('SectorRegistryTest')
+  const SPACEProxy = artifacts.require('SPACEProxy')
   const MiniMeToken = artifacts.require('MiniMeToken')
 
-  const landMinimeToken = await MiniMeToken.new(
+  const spaceMinimeToken = await MiniMeToken.new(
     EMPTY_ADDRESS,
     EMPTY_ADDRESS,
     0,
-    LAND_NAME,
+    SPACE_NAME,
     18,
-    LAND_SYMBOL,
+    SPACE_SYMBOL,
     false,
     creationParams
   )
-  const estateMinimeToken = await MiniMeToken.new(
+  const sectorMinimeToken = await MiniMeToken.new(
     EMPTY_ADDRESS,
     EMPTY_ADDRESS,
     0,
-    ESTATE_NAME,
+    SECTOR_NAME,
     18,
-    ESTATE_SYMBOL,
+    SECTOR_SYMBOL,
     false,
     creationParams
   )
 
-  const proxy = await LANDProxy.new(creationParams)
-  const registry = await LANDRegistry.new(creationParams)
+  const proxy = await SPACEProxy.new(creationParams)
+  const registry = await SPACERegistry.new(creationParams)
 
   await proxy.upgrade(registry.address, creator, sentByCreator)
 
-  const estate = await EstateRegistry.new(
-    ESTATE_NAME,
-    ESTATE_SYMBOL,
+  const sector = await SectorRegistry.new(
+    SECTOR_NAME,
+    SECTOR_SYMBOL,
     proxy.address,
     creationParams
   )
 
-  const land = await LANDRegistry.at(proxy.address)
-  await land.initialize(creator, sentByCreator)
-  await land.setEstateRegistry(estate.address)
+  const space = await SPACERegistry.at(proxy.address)
+  await space.initialize(creator, sentByCreator)
+  await space.setSectorRegistry(sector.address)
 
-  await landMinimeToken.changeController(land.address, sentByCreator)
-  await land.setLandBalanceToken(landMinimeToken.address)
+  await spaceMinimeToken.changeController(space.address, sentByCreator)
+  await space.setSpaceBalanceToken(spaceMinimeToken.address)
 
-  await estateMinimeToken.changeController(estate.address, sentByCreator)
-  await estate.setEstateLandBalance(estateMinimeToken.address)
+  await sectorMinimeToken.changeController(sector.address, sentByCreator)
+  await sector.setSectorSpaceBalance(sectorMinimeToken.address)
 
   return {
     proxy,
     registry,
-    estate,
-    land
+    sector,
+    space
   }
 }
