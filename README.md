@@ -11,4 +11,4 @@ file.
 
 ## License
 
-Code released under [the Apache v2.0 license](https://github.com/decentraspace/space/blob/master/LICENSE).
+Code released under [the Apache v2.0 license](https://github.com/SatyrnFinancial/space/blob/master/LICENSE).

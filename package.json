@@ -10,14 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/decentraspace/space.git"
+    "url": "git+https://github.com/SatyrnFinancial/space.git"
   },
-  "author": "The Decentraspace Team <hello@decentraspace.org>",
+  "author": "The Decentraspace Team <hello@SatyrnFinancial.org>",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/decentraspace/space/issues"
+    "url": "https://github.com/SatyrnFinancial/space/issues"
   },
-  "homepage": "https://github.com/decentraspace/space#readme",
+  "homepage": "https://github.com/SatyrnFinancial/space#readme",
   "dependencies": {
     "erc821": "^5.3.0",
     "openzeppelin-zos": "1.9.4",
